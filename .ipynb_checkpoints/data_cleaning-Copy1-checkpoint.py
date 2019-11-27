@@ -62,9 +62,10 @@ from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import cross_val_score    
 
 
-def cross_validate(k, X_train, y_train):
+def cross_validate(model, k, X_train, y_train):
     
-    mse_results = cross_val_score(linreg, X_train_imputed_scaled, y_train, folds=k, scoring='neg_mean_squared_error')
-    r2_results = cross_val_score(linreg, X_train_imputed_scaled, y_train, folds=k, scoring='r2')
-    return(print(f"After cross-validating the data for {k}-folds: \nMean Squared Errors: {mse_results}  \nR2: {r2_results}"))
+    mse_result = np.mean(cross_val_score(model, X_train_imputed_scaled, y_train, folds=k, scoring='neg_mean_squared_error'))
+    r2_result = np.mean(cross_val_score(model, X_train_imputed_scaled, y_train, folds=k, scoring='r2'))
+    return(print(f"""After cross-validating the data for {k}-folds: \nThe average Mean Squared Errors: np.mean({mse_result}) 
+                 \nThe average R2: {r2_result}"""))
     
