@@ -56,18 +56,27 @@ def cont_model(df, feat_col):
     # Scale the train data
     ss = StandardScaler()
     ss.fit(X_train_continuous)
+    ss_test = StandardScaler()
+    ss_test.fit(X_test_continuous)
     
     X_train_cont_scaled = ss.transform(X_train_continuous)
+    X_test_cont_scaled = ss_test.transform(X_test_continuous)
 
     #Fit the normalized data
     linreg_norm = LinearRegression()
     linreg_norm.fit(X_train_cont_scaled, y_train) 
+    linreg_norm_test = LinearRegression()
+    linreg_norm_test.fit(X_test_cont_scaled, y_test) 
 
-    print('For our initial model, are values are:')
+    print('For our initial model, our values are:')
     print('Training r^2:', linreg_norm.score(X_train_cont_scaled, y_train))
     print('Training MSE:', mean_squared_error(y_train, linreg_norm.predict(X_train_cont_scaled)))
     
-    return X_train_cont_scaled, y_train, linreg_norm
+    print('And for our testing dataset, our values are:')
+    print('Training r^2:', linreg_norm_test.score(X_test_cont_scaled, y_test))
+    print('Training MSE:', mean_squared_error(y_test, linreg_norm_test.predict(X_test_cont_scaled)))
+    
+    return X_train_cont_scaled, y_train, X_test_cont_scaled, y_test, linreg_norm, linreg_norm_test
 
 def RidgeModel(X,Y):
     # Train model setting alpha (lambda) to 0.05
@@ -107,4 +116,4 @@ def cross_validate(model, k, X_train, y_train):
     mse_result = np.mean(cross_val_score(model, X_train, y_train, cv=k, scoring='neg_mean_squared_error'))
     r2_result = np.mean(cross_val_score(model, X_train, y_train, cv=k, scoring='r2'))
     return(print(f"""After cross-validating the data for {k}-folds: \nThe average Mean Squared Errors: np.mean({mse_result}) 
-                 \nThe average R2: {r2_result}"""))
+                 The average R2: {r2_result}\n"""))
