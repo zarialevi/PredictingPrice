@@ -41,31 +41,5 @@ def cat_df():
     cat = pd.DataFrame(df, columns=cat_features)
     return cat
 
-def clean_columns(df):
-    df=df.rename(columns={'review_score':'Review_Score', 'price':'Price_$','freight_value':"Shipping_Cost", 'product_name_lenght':"Product_Name_Length",
-           'product_description_lenght':'Product_Description_Length', 'product_photos_qty':'Product_Photos_Qty', 'product_weight_g':'Product_Weight_g',
-           'product_length_cm':'Product_Length_cm', 'product_height_cm':'Product_Height_cm', 'product_width_cm':'Product_Width_cm'})
-    
-    df["Product_Area_cm2"]=df['Product_Length_cm']*df['Product_Width_cm']
 
-    df["Product_Photos_Qty"].astype('int64')
-    df["Product_Description_Length"].astype('int64')
-    df["Product_Name_Length"].astype('int64')
-    df["Review_Score"].astype('int64')
-
-    new_df=df.drop(columns=['Product_Length_cm','Product_Width_cm'])
-    
-    return new_df
- 
-    
-from sklearn.metrics import mean_squared_error
-from sklearn.model_selection import cross_val_score    
-
-
-def cross_validate(model, k, X_train, y_train):
-    
-    mse_result = np.mean(cross_val_score(model, X_train_imputed_scaled, y_train, folds=k, scoring='neg_mean_squared_error'))
-    r2_result = np.mean(cross_val_score(model, X_train_imputed_scaled, y_train, folds=k, scoring='r2'))
-    return(print(f"""After cross-validating the data for {k}-folds: \nThe average Mean Squared Errors: np.mean({mse_result}) 
-                 \nThe average R2: {r2_result}"""))
     
