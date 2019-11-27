@@ -15,15 +15,22 @@ import scipy.stats as stats
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, mean_squared_log_error
 from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import Lasso
+from sklearn.linear_model import Ridge
+from sklearn.linear_model import ElasticNet
 from sklearn.preprocessing import Imputer
 from sklearn.preprocessing import StandardScaler
 
-def cont_model(df, feat_col):
     
+
+def cont_model(df, feat_col):
+      
+    cat_features = ['seller_state','payment_type','customer_city','customer_state','order_status']
+
     cont_features = []
-    for colname, coltype in df.dtypes.iteritems():
-        if coltype in [np.float64, np.int64]:
-            cont_features.append(colname)
+    for x in df.columns:
+        if x not in cat_features:
+            cont_features.append(x)
     
     features = [col for col in df.columns if col != feat_col]
     X = df.loc[:, features]
@@ -54,68 +61,39 @@ def cont_model(df, feat_col):
 
     #Fit the normalized data
     linreg_norm = LinearRegression()
-    linreg_norm.fit(X_train_cont_scaled, y_train)
+    linreg_norm.fit(X_train_cont_scaled, y_train) 
 
+    print('For our initial model, are values are:')
     print('Training r^2:', linreg_norm.score(X_train_cont_scaled, y_train))
     print('Training MSE:', mean_squared_error(y_train, linreg_norm.predict(X_train_cont_scaled)))
     
-    return linreg_norm
-    
+    return X_train_cont_scaled, y_train, linreg_norm
 
-def cat_model(df, feat_col):
+def RidgeModel(X,Y):
+    # Train model setting alpha (lambda) to 0.05
+    ridge = Ridge(alpha=0.05, normalize=True)
+    #Fit Ridge model to training data
+    ridge.fit(X, Y)
+    y_predict_ridge = ridge.predict(X)
+    # Calculate R^2 and mse
+    print('For our improved model, are values are:')
+    print('Training r^2:',ridge.score(X, Y))
+    print('Training MSE:',mean_squared_error(Y,y_predict_ridge))  
     
-    cont_features = []
-    for colname, coltype in df.dtypes.iteritems():
-        if coltype in [np.float64, np.int64]:
-            cont_features.append(colname)
-            
-    cat_features = []
-    for x in df.columns:
-        if x not in cont_features:
-            cat_features.append(x)
+def LassoModel(X,Y):
+    lasso = Lasso(alpha=0.05, normalize=True)
+    lasso.fit(X, Y)
+    y_predict_lasso = lasso.predict(X)
+    # calculating mse
+    print('For our Lasso model, are values are:')
+    print('Training MSE:',mean_squared_error(Y,y_predict_lasso))
+    print('Training r^2:',lasso.score(X, Y))
     
-    features = [col for col in df.columns if col != feat_col]
-    X = df.loc[:, features]
-    y = df.loc[:, feat_col]
-
-    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=10)
-    
-   # Create X_cat which contains only the categorical variables
-    X_train_cat = X_train.loc[:, cat_features]
-    X_test_cat = X_test.loc[:, cat_features]
-
-    # Impute missing values with median using Imputer from sklearn.preprocessing
-    impute = Imputer(strategy='most_frequent')
-    impute.fit(X_train_cat)
-
-    X_train_categorical = impute.transform(X_train_cat)
-    X_test_categorical = impute.transform(X_test_cat)
-
-    # Fit the model and print R2 and MSE for train and test
-    linreg = LinearRegression()
-    linreg.fit(X_train_categorical, y_train)
-    
-    # Scale the train data
-    ss = StandardScaler()
-    ss.fit(X_train_categorical)
-    
-    X_train_cat_scaled = ss.transform(X_train_categorical)
-    
-    #Fit the normalized data
-    linreg_norm = LinearRegression()
-    linreg_norm.fit(X_train_cat_scaled, y_train)
-
-    print('Training r^2:', linreg_norm.score(X_train_cat_scaled, y_train))
-    print('Training MSE:', mean_squared_error(y_train, linreg_norm.predict(X_train_cat_scaled)))
-    
-    return linreg_norm    
-    
-    
-def full_def(reg1,reg2):
-    
-    x_cat = pd.DataFrame(reg1)
-    
-    x_con = pd.DataFrame(reg2)
-    
-    X_train_all = pd.concat([x_cat,x_con], axis=1)
- 
+def ElasticModel(X,Y):
+    elastic = ElasticNet(alpha=0.05, l1_ratio=0.5, normalize=False)
+    elastic.fit(X,Y)
+    y_predict_elastic = elastic.predict(X)
+    #calculating mse
+    print('For our Elastic model, are values are:')
+    print('Training MSE:', mean_squared_error(Y, y_predict_elastic))
+    print('Training r^2:', elastic.score(X,Y))

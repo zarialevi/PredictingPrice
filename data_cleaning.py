@@ -2,41 +2,32 @@ import pandas as pd
 import numpy as np
 
 
-def get_df():
-    useful = ['order_delivered_customer_date','order_estimated_delivery_date',
-         'payment_type','payment_value','review_id','review_score','customer_city','customer_state','price','freight_value','product_name_lenght','product_description_lenght','product_photos_qty',
-         'product_weight_g','product_length_cm','product_height_cm','product_width_cm','product_category_name_english']
+def data_clean(df):
+    df = pd.read_csv('data/products_full.csv', low_memory=False)
+    df.drop(columns=['order_id','customer_id','review_id','seller_id','product_id','order_item_id',
+                     'customer_unique_id'], inplace=True)
+    df.drop(columns=['Unnamed: 0','review_comment_title','review_creation_date',
+                     'payment_value','review_answer_timestamp','review_comment_message',
+                     'product_category_name','product_category_name_english',
+                     'order_approved_at'], inplace=True)
+    df.drop(columns=['order_purchase_timestamp','order_delivered_customer_date',
+                     'order_estimated_delivery_date','order_delivered_carrier_date','shipping_limit_date'], inplace=True)
+    df = df.dropna()
 
-    df_all = pd.read_csv('data/products_full.csv')
-    df1 = pd.DataFrame(df_all, columns=useful)
-    df.drop(columns='Unnamed: 0')
-    df1.dropna(inplace=True)
-    df1.to_csv('./data/products_new.csv', index=True)
-
-def products_df():
-    df = pd.read_csv('./data/products.csv')
-    return df
+    df['payment_type'] = df['payment_type'].astype('category')
+    df['customer_city'] = df['customer_city'].astype('category')
+    df['customer_state'] = df['customer_state'].astype('category')
+    df['order_status'] = df['order_status'].astype('category')
+    df['seller_city'] = df['seller_city'].astype('category')
+    df['seller_state'] = df['seller_state'].astype('category')
+       
+    df['payment_type'] = df['payment_type'].cat.codes
+    df['customer_city'] = df['customer_city'].cat.codes
+    df['customer_state'] = df['customer_state'].cat.codes
+    df['order_status'] = df['order_status'].cat.codes
+    df['seller_city'] = df['seller_city'].cat.codes
+    df['seller_state'] = df['seller_state'].cat.codes
     
-
-def con_df():
-    df = pd.read_csv('./data/products.csv')
-    cont_features = []
-
-    for colname, coltype in df.dtypes.iteritems():
-        if coltype in [np.float64, np.int64]:
-            cont_features.append(colname)
-
-    cont = pd.DataFrame(df, columns=cont_features)
-    return cont
+    df.to_csv('./data/products_final.csv')
     
-
-def cat_df():
-    df = pd.read_csv('./data/products.csv')
-    cat_features = []
-
-    for colname, coltype in df.dtypes.iteritems():
-        if coltype in [np.object]:
-            cat_features.append(colname)
-
-    cat = pd.DataFrame(df, columns=cat_features)
-    return cat
+    
