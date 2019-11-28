@@ -1,4 +1,4 @@
-# Earthquakes etc
+# E-Commerce Price Predictions
 Greg Simon & Zaria Rankine
 
 ## Introduction
