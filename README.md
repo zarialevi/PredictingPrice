@@ -16,8 +16,8 @@ From the model we get the effect size of each of these features (coefficients) a
 so we can say what aspects the business should focus on.
 
 ### Impact
-The different models run can eliminate or select variables which fit the data ebtter and therefore have
-the strongeste ffect on prices.
+The different models run can eliminate or select variables which fit the data better and therefore have
+the strongest effect on prices.
 From this, data can be input into our  model and the most influential variables on the dependent variable
 chosen (in this case price) will be computed.
 This allows the user to choose where to focus their business model dependant on which variable is storngest.
